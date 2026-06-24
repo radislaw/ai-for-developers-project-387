@@ -24,6 +24,12 @@ model EventType {
   durationMinutes: int32;
 }
 
+model CreateEventTypeInput {
+  title: string;
+  description: string;
+  durationMinutes: int32;
+}
+
 model Slot {
   startAt: utcDateTime;
   endAt: utcDateTime;
@@ -84,16 +90,13 @@ interface EventTypeOperations {
 
   @post
   createEventType(
-    @body eventType: EventType
+    @body eventType: CreateEventTypeInput
   ): {
     @statusCode statusCode: 201;
     @body eventType: EventType;
   } | {
     @statusCode statusCode: 400;
     @body error: BadRequestError;
-  } | {
-    @statusCode statusCode: 409;
-    @body error: ConflictError;
   };
 }
 

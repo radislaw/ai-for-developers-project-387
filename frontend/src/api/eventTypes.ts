@@ -12,7 +12,6 @@ export const getEventType = async (eventTypeId: string): Promise<EventType> => {
 };
 
 export const createEventType = async (eventType: Omit<EventType, 'id'>): Promise<EventType> => {
-  const id = crypto.randomUUID();
-  const response = await api.post<EventType>('/event-types', { ...eventType, id });
+  const response = await api.post<EventType>('/event-types', eventType);
   return response.data;
 };
