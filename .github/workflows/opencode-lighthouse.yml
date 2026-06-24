@@ -2,7 +2,7 @@ name: Daily Lighthouse audit
 
 on:
   schedule:
-    - cron: "30 22 * * 3"  # Every Wed at 22:30
+    - cron: "48 12 * * *"  # Every day at 12:48 UTC
 
 jobs:
   opencode:
