@@ -1,0 +1,32 @@
+name: Daily Lighthouse audit
+
+on:
+  schedule:
+    - cron: "30 22 * * 3"  # Every Wed at 22:30
+
+jobs:
+  opencode:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: write
+      pull-requests: write
+      issues: write
+    steps:
+      - name: Run Lighthouse
+        run: |
+          npx lighthouse https://booking-app-xhnx.onrender.com \
+            --output=json \
+            --output-path=./lighthouse-report.json \
+            --chrome-flags="--headless"
+
+      - name: Analyze with OpenCode
+        uses: anomalyco/opencode/github@latest
+        with:
+          prompt: |
+           Read ./lighthouse-report.json.
+           Compare LCP, CLS, INP with the values in
+           docs/performance-baseline.md.
+           For metrics that degraded by more than 10%,
+           identify likely culprits in recent commits and
+           create an issue with specific recommendations.
