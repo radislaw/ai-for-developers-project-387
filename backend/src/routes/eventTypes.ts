@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { Router, Request, Response } from 'express';
 import { eventTypes } from '../store.js';
 import { EventType } from '../types.js';
@@ -19,16 +20,12 @@ eventTypesRouter.get('/:eventTypeId', (req: Request, res: Response) => {
 
 eventTypesRouter.post('/', (req: Request, res: Response) => {
   const body = req.body as EventType;
-  if (!body.id || !body.title || !body.description || !body.durationMinutes) {
+  if (!body.title || !body.description || !body.durationMinutes) {
     res.status(400).json({ code: 'BAD_REQUEST', message: 'Missing required fields' });
     return;
   }
-  if (eventTypes.find((e) => e.id === body.id)) {
-    res.status(409).json({ code: 'CONFLICT', message: 'Event type with this id already exists' });
-    return;
-  }
   const newEventType: EventType = {
-    id: body.id,
+    id: randomUUID(),
     title: body.title,
     description: body.description,
     durationMinutes: Number(body.durationMinutes),
