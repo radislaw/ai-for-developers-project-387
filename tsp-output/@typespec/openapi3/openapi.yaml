@@ -1,0 +1,399 @@
+openapi: 3.0.0
+info:
+  title: Booking API
+  version: 0.0.0
+tags: []
+paths:
+  /bookings:
+    post:
+      operationId: BookingGuestOperations_createBooking
+      parameters: []
+      responses:
+        '201':
+          description: The request has succeeded and a new resource has been created as a result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        '409':
+          description: The request conflicts with the current state of the server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictError'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                eventTypeId:
+                  type: string
+                guestName:
+                  type: string
+                guestEmail:
+                  type: string
+                guestNotes:
+                  type: string
+                slotStartAt:
+                  type: string
+                  format: date-time
+              required:
+                - eventTypeId
+                - guestName
+                - guestEmail
+                - slotStartAt
+  /bookings/upcoming:
+    get:
+      operationId: BookingOwnerOperations_listUpcomingBookings
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Booking'
+  /event-types:
+    get:
+      operationId: EventTypeOperations_listEventTypes
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventType'
+              example:
+                - id: "evt-15min"
+                  title: "Встреча 15 минут"
+                  description: "Короткий тип события для быстрого слота."
+                  durationMinutes: 15
+                - id: "evt-30min"
+                  title: "Встреча 30 минут"
+                  description: "Базовый тип события для бронирования."
+                  durationMinutes: 30
+    post:
+      operationId: EventTypeOperations_createEventType
+      parameters: []
+      responses:
+        '201':
+          description: The request has succeeded and a new resource has been created as a result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventType'
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        '409':
+          description: The request conflicts with the current state of the server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictError'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventType'
+  /event-types/{eventTypeId}:
+    get:
+      operationId: EventTypeItemOperations_getEventType
+      parameters:
+        - name: eventTypeId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventType'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+  /event-types/{eventTypeId}/slots:
+    get:
+      operationId: SlotOperations_listSlots
+      parameters:
+        - name: eventTypeId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: from
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+          explode: false
+        - name: to
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Slot'
+              example:
+                - startAt: "2026-05-30T09:00:00Z"
+                  endAt: "2026-05-30T09:15:00Z"
+                  available: false
+                  bookingId: "booking-001"
+                - startAt: "2026-05-30T09:15:00Z"
+                  endAt: "2026-05-30T09:30:00Z"
+                  available: true
+                - startAt: "2026-05-30T09:30:00Z"
+                  endAt: "2026-05-30T09:45:00Z"
+                  available: true
+                - startAt: "2026-05-30T10:00:00Z"
+                  endAt: "2026-05-30T10:15:00Z"
+                  available: true
+                - startAt: "2026-05-30T10:15:00Z"
+                  endAt: "2026-05-30T10:30:00Z"
+                  available: false
+                  bookingId: "booking-002"
+                - startAt: "2026-06-02T09:00:00Z"
+                  endAt: "2026-06-02T09:15:00Z"
+                  available: true
+                - startAt: "2026-06-02T09:15:00Z"
+                  endAt: "2026-06-02T09:30:00Z"
+                  available: true
+                - startAt: "2026-06-02T10:00:00Z"
+                  endAt: "2026-06-02T10:15:00Z"
+                  available: false
+                  bookingId: "booking-003"
+                - startAt: "2026-06-03T09:00:00Z"
+                  endAt: "2026-06-03T09:15:00Z"
+                  available: true
+                - startAt: "2026-06-03T09:30:00Z"
+                  endAt: "2026-06-03T09:45:00Z"
+                  available: true
+                - startAt: "2026-06-04T11:00:00Z"
+                  endAt: "2026-06-04T11:15:00Z"
+                  available: true
+                - startAt: "2026-06-04T11:15:00Z"
+                  endAt: "2026-06-04T11:30:00Z"
+                  available: true
+                - startAt: "2026-06-05T14:00:00Z"
+                  endAt: "2026-06-05T14:15:00Z"
+                  available: true
+                - startAt: "2026-06-06T09:00:00Z"
+                  endAt: "2026-06-06T09:15:00Z"
+                  available: false
+                  bookingId: "booking-004"
+                - startAt: "2026-06-06T09:15:00Z"
+                  endAt: "2026-06-06T09:30:00Z"
+                  available: true
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+  /owner:
+    get:
+      operationId: OwnerOperations_getOwner
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Owner'
+components:
+  schemas:
+    BadRequestError:
+      type: object
+      required:
+        - code
+      properties:
+        code:
+          type: string
+          enum:
+            - BAD_REQUEST
+      allOf:
+        - $ref: '#/components/schemas/ErrorResponse'
+    Booking:
+      type: object
+      required:
+        - id
+        - eventTypeId
+        - guestName
+        - guestEmail
+        - startAt
+        - endAt
+        - createdAt
+      properties:
+        id:
+          type: string
+          example: "booking-001"
+        eventTypeId:
+          type: string
+          example: "evt-15min"
+        guestName:
+          type: string
+          example: "Иван Иванов"
+        guestEmail:
+          type: string
+          example: "ivan@example.com"
+        guestNotes:
+          type: string
+          example: "Хочу обсудить проект"
+        startAt:
+          type: string
+          format: date-time
+          example: "2026-06-15T10:00:00Z"
+        endAt:
+          type: string
+          format: date-time
+          example: "2026-06-15T10:15:00Z"
+        createdAt:
+          type: string
+          format: date-time
+          example: "2026-06-01T09:00:00Z"
+    ConflictError:
+      type: object
+      required:
+        - code
+      properties:
+        code:
+          type: string
+          enum:
+            - CONFLICT
+      allOf:
+        - $ref: '#/components/schemas/ErrorResponse'
+    ErrorResponse:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: string
+    EventType:
+      type: object
+      required:
+        - id
+        - title
+        - description
+        - durationMinutes
+      properties:
+        id:
+          type: string
+          example: "evt-15min"
+        title:
+          type: string
+          example: "Встреча 15 минут"
+        description:
+          type: string
+          example: "Короткий тип события для быстрого слота."
+        durationMinutes:
+          type: integer
+          format: int32
+          example: 15
+    NotFoundError:
+      type: object
+      required:
+        - code
+      properties:
+        code:
+          type: string
+          enum:
+            - NOT_FOUND
+      allOf:
+        - $ref: '#/components/schemas/ErrorResponse'
+    Owner:
+      type: object
+      required:
+        - id
+        - name
+        - title
+        - timezone
+      properties:
+        id:
+          type: string
+          example: "owner-1"
+        name:
+          type: string
+          example: "Tota"
+        title:
+          type: string
+          example: "Host"
+        timezone:
+          type: string
+          example: "Europe/Moscow"
+    Slot:
+      type: object
+      required:
+        - startAt
+        - endAt
+        - available
+      properties:
+        startAt:
+          type: string
+          format: date-time
+          example: "2026-06-15T10:00:00Z"
+        endAt:
+          type: string
+          format: date-time
+          example: "2026-06-15T10:15:00Z"
+        available:
+          type: boolean
+          example: true
+        bookingId:
+          type: string
+          example: "booking-001"
+servers:
+  - url: https://api.example.com
+    description: Production server
+    variables: {}

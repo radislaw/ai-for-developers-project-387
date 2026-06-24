@@ -1,0 +1,13 @@
+**/node_modules
+**/dist
+.git
+.omc
+**/.omc
+e2e
+.idea
+**/.DS_Store
+tsp-output
+*.log
+**/*.log
+.github
+docs
